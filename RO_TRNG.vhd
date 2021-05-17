@@ -44,6 +44,13 @@ architecture Behavioral of RO_TRNG is
                randOut  : out STD_LOGIC);
     end component;
 
+    component ring_oscillator is
+        Port ( 
+            clk     : in std_logic;
+            output  : out std_logic
+        );
+    end component;
+
     component sseg_des is
     Port( COUNT : in std_logic_vector(15 downto 0); 				  
             CLK : in std_logic;
