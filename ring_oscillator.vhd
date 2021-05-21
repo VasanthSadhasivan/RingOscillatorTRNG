@@ -73,7 +73,7 @@ begin
     enable <= '1';
     wire2 <= not wire1;
     
-    latch1 : process(enable)
+    latch1 : process(enable, wire2)
     begin
         if enable = '1' then
             wire3 <= wire2;
@@ -83,7 +83,7 @@ begin
     wire4 <= not wire3;
     wire5 <= not wire4;
     
-    latch2 : process(enable)
+    latch2 : process(enable, wire5)
     begin
         if enable = '1' then
             wire1 <= wire5;

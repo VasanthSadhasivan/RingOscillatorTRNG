@@ -39,25 +39,30 @@ architecture Behavioral of controller is
     signal zerosCnt        : std_logic_vector(3 downto 0);
     signal clockCyclesDone : std_logic;
     signal zerosDone       : std_logic;
+    signal prevSample      : std_logic;
     
 begin
     
     enable <= (zerosDone AND clockCyclesDone);
     reset  <= NOT(zerosDone AND clockCyclesDone);
     
+    storeSample: process(sample,clk)
+    begin
+        if rising_edge(clk) then
+            prevSample <= sample;
+        end if;
+    end process;
+    
     cycleCnt: process(sample,clk)
     begin
         if rising_edge(clk) then
-            if rising_edge(sample) then
+            clockCyclesDone <= '1';
+            if (prevSample='0')AND(sample='1') then
                 clockCyclesCnt <= (others=>'0');
                 clockCyclesDone <= '0';
-            else
-                if clockCyclesCnt < numClockCycles then
-                    clockCyclesCnt <= clockCyclesCnt +1;
-                    clockCyclesDone <= '0';
-                else
-                    clockCyclesDone <= '1';
-                end if;
+            elsif clockCyclesCnt < numClockCycles then
+                clockCyclesCnt <= clockCyclesCnt +1;
+                clockCyclesDone <= '0';
             end if;
         end if;
     end process;
@@ -65,17 +70,14 @@ begin
     zeroCnt: process(sample,clk)
     begin
         if rising_edge(clk) then
-            if rising_edge(sample) then
+            zerosDone <= '1';
+            if (prevSample='0')AND(sample='1') then
                 zerosCnt <= (others=>'0');
                 zerosDone <= '0';
-            else
-                if zerosCnt < numZeros then
-                    if sample = '0' then
-                        zerosCnt <= clockCyclesCnt +1;
-                    end if;
-                    zerosDone <= '0';
-                else
-                    zerosDone <= '1';
+            elsif zerosCnt < numZeros then
+                zerosDone <= '0';
+                if sample = '0' then
+                    zerosCnt <= clockCyclesCnt +1;
                 end if;
             end if;
         end if;

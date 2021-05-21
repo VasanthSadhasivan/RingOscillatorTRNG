@@ -46,8 +46,9 @@ architecture Behavioral of RO_TRNG is
 
     component ring_oscillator is
         Port ( 
-            output  : out std_logic
-        );
+
+output  : out std_logic
+ );
     end component;
 
     component sseg_des is
@@ -67,7 +68,81 @@ architecture Behavioral of RO_TRNG is
           done     : OUT  STD_LOGIC;
           push     : OUT  STD_LOGIC);
     END component;
+    
+    component controller is
+    Port ( clk    : in STD_LOGIC;
+           sample : in STD_LOGIC;
+           reset   : out STD_LOGIC;
+           enable  : out STD_LOGIC);
+    end component;
+    
+    component shift_register is
+    Port ( clk    : in STD_LOGIC;
+           input  : in STD_LOGIC;
+           push   : in STD_LOGIC;
+           output  : out STD_LOGIC_VECTOR (7 downto 0));
+    end component;
 
+    signal clk0     : std_logic;
+    signal clk1     : std_logic;
+    signal reset    : std_logic;
+    signal enable   : std_logic;
+    signal readAck  : std_logic;
+    signal sample   : std_logic;
+    signal bitReady : std_logic;
+    signal randOut  : std_logic;
+    signal push     : std_logic;
+    signal randVal  : std_logic_vector(15 downto 0);
+    
 begin
+    RO_0: ring_oscillator
+	port map ( output => clk0 ); 
+	
+	RO_1: ring_oscillator
+	port map ( output => clk1 ); 
+	
+	mySampler: sampler
+	port map ( 
+	clk0     => clk0, 
+    clk1     => clk1,
+    reset    => reset,
+    enable   => enable,
+    readAck  => readAck,
+    sample   => sample,
+    bitReady => bitReady,
+    randOut  => randOut); 
+    
+    myController: controller
+	port map ( 
+    clk    => clk1,
+    sample => sample,
+    reset  => reset,
+    enable => enable);
+    
+    myFSM: fsm
+	port map ( 
+    clk      => clk,
+    bitReady => bitReady,
+    reset    => BTNC,
+    readAck  => readAck,
+    done     => LED,
+    push     => push);
+    
+    myShiftRegister: shift_register
+	port map (
+    clk    => clk, 
+    input  => randOut, 
+    push   => push, 
+    output => randVal(7 downto 0)); 
 
+    randVal(15 downto 8) <= "00000000";
+    
+    my_sseg_des:sseg_des
+    port map ( 
+    COUNT 	 => randVal,  
+    CLK      => clk,
+    VALID    => '1',
+    DISP_EN  => DISP_EN,
+    SEGMENTS => SEGMENTS);
+    
 end Behavioral;

@@ -61,6 +61,7 @@ architecture my_sseg of sseg_des is
     signal   cnt_dig : std_logic_vector(1 downto 0); 
     signal   digit : std_logic_vector (3 downto 0); 
     signal   sclk : std_logic;
+    
 begin	
 				 
     -- instantiation of clock divider -----------------

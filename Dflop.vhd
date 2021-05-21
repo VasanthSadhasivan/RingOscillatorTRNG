@@ -33,7 +33,7 @@ architecture Behavioral of Dflop is
 
 begin
 
-    flop: process(clk)
+    flop: process(clk,init)
     begin
         if (init = '1') then
             Q <= '0';
