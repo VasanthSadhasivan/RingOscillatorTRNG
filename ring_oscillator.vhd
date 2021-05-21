@@ -33,50 +33,43 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 entity ring_oscillator is
     Port ( 
-        clk     : in std_logic;
         output  : out std_logic
     );
 end ring_oscillator;
 
 architecture Behavioral of ring_oscillator is
-
     signal wire1 : std_logic := '0';
     signal wire2 : std_logic := '1';
     signal wire3 : std_logic := '1';
     signal wire4 : std_logic := '1';
+    signal wire5 : std_logic := '1';
+    
+    signal outputwire : std_logic := '1';
+    
     
     signal enable : std_logic := '0';
 
 begin
     enable <= '1';
-
     wire2 <= not wire1;
-    flop1 : process(clk)
+    
+    latch1 : process(enable)
     begin
-        if rising_edge(clk) then
+        if enable = '1' then
             wire3 <= wire2;
         end if;
     end process;
     
-    latch1 : process(enable)
-    begin 
-        if enable = '1' then
-            wire4 <= wire3;
-        end if;
-    end process;
- 
+    wire4 <= not wire3;
+    wire5 <= not wire4;
+    
     latch2 : process(enable)
-    begin 
-        if enable = '1' then
-            output <= wire4;
-        end if;
-    end process;
-    
-    flop2 : process(clk)
     begin
-        if rising_edge(clk) then
-            wire1 <= wire4;
+        if enable = '1' then
+            wire1 <= wire5;
         end if;
     end process;
     
+    outputwire <= not wire5;
+    output <= not outputwire;
 end Behavioral;

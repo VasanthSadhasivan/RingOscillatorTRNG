@@ -46,7 +46,6 @@ architecture Behavioral of RO_TRNG is
 
     component ring_oscillator is
         Port ( 
-            clk     : in std_logic;
             output  : out std_logic
         );
     end component;
