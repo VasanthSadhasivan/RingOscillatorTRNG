@@ -38,6 +38,11 @@ entity ring_oscillator is
 end ring_oscillator;
 
 architecture Behavioral of ring_oscillator is
+    
+    attribute KEEP : string;
+    attribute S    : string;
+
+
     signal wire1 : std_logic := '0';
     signal wire2 : std_logic := '1';
     signal wire3 : std_logic := '1';
@@ -48,6 +53,21 @@ architecture Behavioral of ring_oscillator is
     
     
     signal enable : std_logic := '0';
+    
+    attribute KEEP of wire1   : signal is "True";
+    attribute S    of wire1   : signal is "True";
+    attribute KEEP of wire2   : signal is "True";
+    attribute S    of wire2   : signal is "True";
+    attribute KEEP of wire3   : signal is "True";
+    attribute S    of wire3   : signal is "True";
+    attribute KEEP of wire4   : signal is "True";
+    attribute S    of wire4   : signal is "True";
+    attribute KEEP of wire5   : signal is "True";
+    attribute S    of wire5   : signal is "True";
+    attribute KEEP of outputwire : signal is "True";
+    attribute S    of outputwire : signal is "True";
+    attribute KEEP of enable  : signal is "True";
+    attribute S    of enable  : signal is "True";
 
 begin
     enable <= '1';
