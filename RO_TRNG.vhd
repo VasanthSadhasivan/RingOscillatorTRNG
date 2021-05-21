@@ -59,6 +59,16 @@ architecture Behavioral of RO_TRNG is
        SEGMENTS : out std_logic_vector(6 downto 0)); -- Decimal Point is never used
     end component;
 
+    component fsm IS
+       PORT(
+          clk      : IN   STD_LOGIC;
+          bitReady : IN   STD_LOGIC;
+          reset    : IN   STD_LOGIC;
+          readAck  : OUT  STD_LOGIC;
+          done     : OUT  STD_LOGIC;
+          push     : OUT  STD_LOGIC);
+    END component;
+
 begin
 
 end Behavioral;
