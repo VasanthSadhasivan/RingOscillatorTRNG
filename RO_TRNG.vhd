@@ -58,7 +58,13 @@ output  : out std_logic
         DISP_EN : out std_logic_vector(3 downto 0);
        SEGMENTS : out std_logic_vector(6 downto 0)); -- Decimal Point is never used
     end component;
-
+    
+    component ila_0 IS
+    PORT (
+        clk    : IN STD_LOGIC;       
+        probe0 : IN STD_LOGIC_VECTOR(0 DOWNTO 0));
+    end component;
+    
     component fsm IS
        PORT(
           clk      : IN   STD_LOGIC;
@@ -80,7 +86,7 @@ output  : out std_logic
     Port ( clk    : in STD_LOGIC;
            input  : in STD_LOGIC;
            push   : in STD_LOGIC;
-           output  : out STD_LOGIC_VECTOR (7 downto 0));
+           output  : out STD_LOGIC_VECTOR (15 downto 0));
     end component;
 
     signal clk0     : std_logic;
@@ -92,7 +98,18 @@ output  : out std_logic
     signal bitReady : std_logic;
     signal randOut  : std_logic;
     signal push     : std_logic;
+    signal done     : std_logic;
+    signal resetFSM : std_logic;
     signal randVal  : std_logic_vector(15 downto 0);
+    
+    attribute MARK_DEBUG : string;
+    attribute MARK_DEBUG of bitReady: signal is "TRUE";
+    attribute MARK_DEBUG of push: signal is "TRUE";
+    attribute MARK_DEBUG of done: signal is "TRUE";
+    attribute MARK_DEBUG of resetFSM: signal is "TRUE";
+    attribute MARK_DEBUG of readAck: signal is "TRUE";
+    attribute MARK_DEBUG of randOut: signal is "TRUE";
+    --attribute MARK_DEBUG of randVal: signal is "TRUE";
     
 begin
     RO_0: ring_oscillator
@@ -105,8 +122,8 @@ begin
 	port map ( 
 	clk0     => clk0, 
     clk1     => clk1,
-    reset    => reset,
-    enable   => enable,
+    reset    => '0',
+    enable   => '1',
     readAck  => readAck,
     sample   => sample,
     bitReady => bitReady,
@@ -123,19 +140,19 @@ begin
 	port map ( 
     clk      => clk,
     bitReady => bitReady,
-    reset    => BTNC,
+    reset    => resetFSM,
     readAck  => readAck,
-    done     => LED,
+    done     => done,
     push     => push);
+    LED <= done;
+    resetFSM<= BTNC;
     
     myShiftRegister: shift_register
 	port map (
     clk    => clk, 
     input  => randOut, 
     push   => push, 
-    output => randVal(7 downto 0)); 
-
-    randVal(15 downto 8) <= "00000000";
+    output => randVal); 
     
     my_sseg_des:sseg_des
     port map ( 

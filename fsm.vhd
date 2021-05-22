@@ -42,6 +42,9 @@ ARCHITECTURE a OF fsm IS
    TYPE STATE_TYPE IS (initState, waitState, pushState, indexCheckState, doneState);
    SIGNAL state   : STATE_TYPE;
    SIGNAL index   : std_logic_vector(4 downto 0);
+   attribute MARK_DEBUG : string;
+   attribute MARK_DEBUG of state: signal is "TRUE";
+   attribute MARK_DEBUG of index: signal is "TRUE";
 BEGIN
    PROCESS (clk, reset)
    BEGIN
@@ -64,13 +67,9 @@ BEGIN
                   state <= waitState;
                END IF;
             WHEN pushState=>
-               IF bitReady = '1' THEN
-                  state <= pushState;
-               ELSE
-                  state <= indexCheckState;
-               END IF;
+               state <= indexCheckState;
             WHEN indexCheckState=>
-               IF index < "1000" THEN
+               IF index < "10000" THEN
                   state <= waitState;
                ELSE
                   state <= doneState;
@@ -87,6 +86,7 @@ BEGIN
    
    PROCESS (state)
    BEGIN
+      readAck <= '0';
       CASE state IS
          WHEN initState =>
             done <= '0';
@@ -97,6 +97,7 @@ BEGIN
          WHEN pushState =>
             done <= '0';
             push <= '1';
+            readAck <= '1';
          WHEN indexCheckState =>
             done <= '0';
             push <= '0';

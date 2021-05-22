@@ -45,13 +45,11 @@ architecture Behavioral of sampler is
     signal C        : std_logic;
     signal notC     : std_logic;
     signal S        : std_logic;
-    signal notEn   : std_logic;
     signal notClk1 : std_logic;
     
 begin
     notClk1 <= not Clk1;
     notC    <= not C;
-    notEn   <= not enable;
     sample  <= S;
     
     --top left flip flop in figure 5 of paper
@@ -68,7 +66,7 @@ begin
         port map(
             clk  => S,
             D    => '1',
-            CE   => notEn,
+            CE   => enable,
             init => readAck,
             Q    => bitReady);
             
@@ -77,7 +75,7 @@ begin
         port map(
             clk  => S,
             D    => C,
-            CE   => notEn,
+            CE   => '1',
             init => '0',
             Q    => randOut);
                                 
@@ -86,7 +84,7 @@ begin
         port map(
             clk  => notClk1,
             D    => notC,
-            CE   => notEn,
+            CE   => enable,
             init => reset,
             Q    => C);
                                         

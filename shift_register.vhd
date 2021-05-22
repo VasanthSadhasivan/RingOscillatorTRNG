@@ -35,12 +35,14 @@ entity shift_register is
     Port ( clk : in STD_LOGIC;
            input : in STD_LOGIC;
            push : in STD_LOGIC;
-           output : out STD_LOGIC_VECTOR (7 downto 0));
+           output : out STD_LOGIC_VECTOR (15 downto 0));
 end shift_register;
 
 architecture Behavioral of shift_register is
 
-signal internalBuffer : std_logic_vector(7 downto 0);
+    signal internalBuffer : std_logic_vector(15 downto 0);
+    attribute MARK_DEBUG : string;
+    attribute MARK_DEBUG of internalBuffer: signal is "TRUE";
 
 begin
 
@@ -48,16 +50,11 @@ begin
     begin
         if rising_edge(clk) then 
             if push = '1' then
-                internalBuffer(7) <= internalBuffer(6);
-                internalBuffer(6) <= internalBuffer(5);
-                internalBuffer(5) <= internalBuffer(4);
-                internalBuffer(4) <= internalBuffer(3);
-                internalBuffer(3) <= internalBuffer(2);
-                internalBuffer(2) <= internalBuffer(1);
-                internalBuffer(1) <= internalBuffer(0);
-                internalBuffer(0) <= input;
+                internalBuffer <= internalBuffer(14 downto 0)&input;
             end if;
         end if;
     end process;
+    
+    output <= internalBuffer;
 
 end Behavioral;
