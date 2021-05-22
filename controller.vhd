@@ -32,38 +32,21 @@ end controller;
 
 architecture Behavioral of controller is
     
-    constant numClockCycles : std_logic_vector(3 downto 0) := "1000";
-    constant numZeros       : std_logic_vector(3 downto 0) := "0100";
+    constant numZeros      : std_logic_vector(3 downto 0) := "1000";
     
-    signal clockCyclesCnt  : std_logic_vector(3 downto 0);
     signal zerosCnt        : std_logic_vector(3 downto 0);
-    signal clockCyclesDone : std_logic;
     signal zerosDone       : std_logic;
     signal prevSample      : std_logic;
     
 begin
     
-    enable <= (zerosDone AND clockCyclesDone);
-    reset  <= NOT(zerosDone AND clockCyclesDone);
+    enable <= (zerosDone);
+    reset  <= NOT(zerosDone);
     
     storeSample: process(sample,clk)
     begin
         if rising_edge(clk) then
             prevSample <= sample;
-        end if;
-    end process;
-    
-    cycleCnt: process(sample,clk)
-    begin
-        if rising_edge(clk) then
-            clockCyclesDone <= '1';
-            if (prevSample='0')AND(sample='1') then
-                clockCyclesCnt <= (others=>'0');
-                clockCyclesDone <= '0';
-            elsif clockCyclesCnt < numClockCycles then
-                clockCyclesCnt <= clockCyclesCnt +1;
-                clockCyclesDone <= '0';
-            end if;
         end if;
     end process;
     
@@ -77,7 +60,7 @@ begin
             elsif zerosCnt < numZeros then
                 zerosDone <= '0';
                 if sample = '0' then
-                    zerosCnt <= clockCyclesCnt +1;
+                    zerosCnt <= zerosCnt +1;
                 end if;
             end if;
         end if;
