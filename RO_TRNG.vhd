@@ -122,8 +122,8 @@ begin
 	port map ( 
 	clk0     => clk0, 
     clk1     => clk1,
-    reset    => '0',
-    enable   => '1',
+    reset    => reset,
+    enable   => enable,
     readAck  => readAck,
     sample   => sample,
     bitReady => bitReady,

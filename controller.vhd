@@ -32,8 +32,8 @@ end controller;
 
 architecture Behavioral of controller is
     
-    constant numClockCycles : std_logic_vector(3 downto 0) := "1111";
-    constant numZeros       : std_logic_vector(3 downto 0) := "1111";
+    constant numClockCycles : std_logic_vector(3 downto 0) := "1000";
+    constant numZeros       : std_logic_vector(3 downto 0) := "0100";
     
     signal clockCyclesCnt  : std_logic_vector(3 downto 0);
     signal zerosCnt        : std_logic_vector(3 downto 0);
