@@ -32,6 +32,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 ENTITY fsm IS
    PORT(
       clk      : IN   STD_LOGIC;
+      bitValue : IN   STD_LOGIC;
       bitReady : IN   STD_LOGIC;
       reset    : IN   STD_LOGIC;
       readAck  : OUT  STD_LOGIC;
@@ -39,9 +40,11 @@ ENTITY fsm IS
       push     : OUT  STD_LOGIC);
 END fsm;
 ARCHITECTURE a OF fsm IS
-   TYPE STATE_TYPE IS (initState, waitState, pushState, indexCheckState, doneState);
+   TYPE STATE_TYPE IS (initState, wait1State, putFirstState, wait2State, putSecondState, checkState, pushState, doneState);
    SIGNAL state   : STATE_TYPE;
    SIGNAL index   : std_logic_vector(4 downto 0);
+   SIGNAL firstValue : std_logic;
+   SIGNAL secondValue : std_logic;
    attribute MARK_DEBUG : string;
    attribute MARK_DEBUG of state: signal is "TRUE";
    attribute MARK_DEBUG of index: signal is "TRUE";
@@ -57,23 +60,45 @@ BEGIN
                   state <= initState;
                ELSE
                   index <= "00000";
-                  state <= waitState;
+                  state <= wait1State;
                END IF;
-            WHEN waitState=>
+            WHEN wait1State=>
                IF bitReady = '1' THEN
+                  state <= putFirstState;
+               ELSE
+                  state <= wait1State;
+               END IF;
+            WHEN putFirstState=>
+               if bitReady = '1' then
+                  state <= putFirstState;
+               else
+                  state <= wait2State;
+               end if;
+            WHEN wait2State =>
+               IF bitReady = '1' THEN
+                  state <= putSecondState;
+               ELSE
+                  state <= wait2State;
+               END IF;
+            WHEN putSecondState=>
+               if bitReady = '1' then
+                  state <= putSecondState;
+               else
+                  state <= checkState;
+               end if;
+            WHEN checkState=>
+               if firstValue /= secondValue then
                   state <= pushState;
                   index <= index + 1;
-               ELSE
-                  state <= waitState;
-               END IF;
+               else
+                  state <= wait1State;
+               end if;
             WHEN pushState=>
-               state <= indexCheckState;
-            WHEN indexCheckState=>
-               IF index < "10000" THEN
-                  state <= waitState;
-               ELSE
+               if index < "10000" then
+                  state <= wait1State;
+               else
                   state <= doneState;
-               END IF;
+               end if;
             WHEN doneState=>
                IF reset = '1' THEN
                   state <= initState;
@@ -86,22 +111,40 @@ BEGIN
    
    PROCESS (state)
    BEGIN
-      readAck <= '0';
+      
       CASE state IS
          WHEN initState =>
+            readAck <= '0';
             done <= '0';
             push <= '0';
-         WHEN waitState =>
+         WHEN wait1State =>
+            readAck <= '0';
+            done <= '0';
+            push <= '0';
+         when putFirstState =>
+            done <= '0';
+            push <= '0';
+            readAck <= '1';
+            firstValue <= bitValue;
+         WHEN wait2State =>
+            readAck <= '0';
+            done <= '0';
+            push <= '0';
+         when putSecondState =>
+            done <= '0';
+            push <= '0';
+            readAck <= '1';
+            secondValue <= bitValue;
+         WHEN checkState =>
+            readAck <= '0';
             done <= '0';
             push <= '0';
          WHEN pushState =>
             done <= '0';
             push <= '1';
-            readAck <= '1';
-         WHEN indexCheckState =>
-            done <= '0';
-            push <= '0';
+            readAck <= '0';
          WHEN doneState =>
+            readAck <= '0';
             done <= '1';
             push <= '0';
       END CASE;

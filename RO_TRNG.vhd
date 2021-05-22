@@ -69,6 +69,7 @@ output  : out std_logic
        PORT(
           clk      : IN   STD_LOGIC;
           bitReady : IN   STD_LOGIC;
+          bitValue : IN   STD_LOGIC;
           reset    : IN   STD_LOGIC;
           readAck  : OUT  STD_LOGIC;
           done     : OUT  STD_LOGIC;
@@ -140,6 +141,7 @@ begin
 	port map ( 
     clk      => clk,
     bitReady => bitReady,
+    bitValue => randOut,
     reset    => resetFSM,
     readAck  => readAck,
     done     => done,
